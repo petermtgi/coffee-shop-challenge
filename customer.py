@@ -1,12 +1,6 @@
 class Customer:
-    _all = []
-
     def __init__(self, name):
-        self.name = name
-        Customer._all.append(self)
-
-    def __repr__(self):
-        return f"Customer('{self._name}')"
+        self.name = name  # Uses setter for validation
 
     @property
     def name(self):
@@ -14,27 +8,27 @@ class Customer:
 
     @name.setter
     def name(self, value):
-        if isinstance(value, str) and 1 <= len(value) <= 15:
-            self._name = value
-        else:
-            raise ValueError("Name must be a string between 1 and 15 characters.")
+        if not isinstance(value, str) or not (1 <= len(value) <= 15):
+            raise ValueError("Customer name must be a string between 1 and 15 characters")
+        self._name = value
 
     def orders(self):
-        return [order for order in Order._all if order.customer == self]
+        return [order for order in Order.all_orders if order.customer == self]
 
     def coffees(self):
-        return list({order.coffee for order in self.orders()})
+        return list(set(order.coffee for order in self.orders()))
 
     def create_order(self, coffee, price):
+        if not isinstance(coffee, Coffee):
+            raise ValueError("Coffee must be a Coffee instance")
         return Order(self, coffee, price)
 
     @classmethod
     def most_aficionado(cls, coffee):
-        top_customer = None
-        top_spent = 0
-        for customer in cls._all:
-            total = sum(order.price for order in customer.orders() if order.coffee == coffee)
-            if total > top_spent:
-                top_spent = total
-                top_customer = customer
-        return top_customer
+        if not isinstance(coffee, Coffee):
+            raise ValueError("Argument must be a Coffee instance")
+        customer_spending = {}
+        for order in coffee.orders():
+            customer = order.customer
+            customer_spending[customer] = customer_spending.get(customer, 0) + order.price
+        return max(customer_spending.items(), key=lambda x: x[1])[0] if customer_spending else None
