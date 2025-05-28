@@ -2,7 +2,7 @@ from customer import Customer
 from coffee import Coffee
 from order import Order
 
-# Example usage for debugging
+
 if __name__ == "__main__":
     # Create customers
     alice = Customer("Alice")
