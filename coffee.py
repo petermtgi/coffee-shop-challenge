@@ -13,7 +13,7 @@ class Coffee:
 
     @property
     def name(self):
-        return self._name  # Immutable after init
+        return self._name 
 
     def orders(self):
         return [order for order in Order._all if order.coffee == self]
