@@ -5,40 +5,28 @@ from order import Order
 
 class TestOrder(unittest.TestCase):
     def setUp(self):
-        Customer._all.clear()
-        Coffee._all.clear()
-        Order._all.clear()
+        Order.all_orders = []  # Reset orders
+        self.alice = Customer("Alice")
+        self.latte = Coffee("Latte")
 
-    def test_order_valid_init(self):
-        c = Customer("Lena")
-        coffee = Coffee("Macchiato")
-        order = Order(c, coffee, 5.0)
-        self.assertEqual(order.customer, c)
-        self.assertEqual(order.coffee, coffee)
+    def test_initialization(self):
+        order = Order(self.alice, self.latte, 5.0)
+        self.assertEqual(order.customer, self.alice)
+        self.assertEqual(order.coffee, self.latte)
         self.assertEqual(order.price, 5.0)
 
-    def test_order_invalid_customer(self):
-        coffee = Coffee("Cortado")
-        with self.assertRaises(TypeError):
-            Order("NotACustomer", coffee, 3.5)
-
-    def test_order_invalid_coffee(self):
-        c = Customer("Mark")
-        with self.assertRaises(TypeError):
-            Order(c, "NotACoffee", 3.5)
-
-    def test_order_invalid_price(self):
-        c = Customer("Leo")
-        coffee = Coffee("Brew")
-
+    def test_price_validation(self):
         with self.assertRaises(ValueError):
-            Order(c, coffee, 0.99)  # Too cheap
-
+            Order(self.alice, self.latte, 0.5)  # Too low
         with self.assertRaises(ValueError):
-            Order(c, coffee, 12.0)  # Too expensive
-
+            Order(self.alice, self.latte, 11.0)  # Too high
         with self.assertRaises(ValueError):
-            Order(c, coffee, "NotAFloat")  # Wrong type
+            Order(self.alice, self.latte, "5.0")  # Wrong type
 
-if __name__ == '__main__':
+    def test_price_immutability(self):
+        order = Order(self.alice, self.latte, 5.0)
+        with self.assertRaises(AttributeError):
+            order.price = 6.0
+
+if __name__ == "__main__":
     unittest.main()

@@ -4,8 +4,11 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+# No additional packages required for this project
 
 [dev-packages]
+# For testing
+pytest = "*"
 
 [requires]
-python_version = "3.12"
+python_version = "3.8"

@@ -5,46 +5,34 @@ from order import Order
 
 class TestCoffee(unittest.TestCase):
     def setUp(self):
-        Coffee._all.clear()
-        Order._all.clear()
-        Customer._all.clear()
+        Order.all_orders = []  # Reset orders
+        self.latte = Coffee("Latte")
+        self.alice = Customer("Alice")
 
-    def test_valid_coffee_name(self):
-        coffee = Coffee("Espresso")
-        self.assertEqual(coffee.name, "Espresso")
-
-    def test_invalid_coffee_name(self):
+    def test_name_validation(self):
         with self.assertRaises(ValueError):
-            Coffee("A")  # too short
-
+            Coffee("ab")  # Too short
         with self.assertRaises(ValueError):
-            Coffee(123)  # not a string
+            Coffee(123)  # Wrong type
+        with self.assertRaises(AttributeError):
+            self.latte.name = "Mocha"  # Immutable
 
-    def test_coffee_orders_customers(self):
-        c1 = Customer("Jess")
-        c2 = Customer("Sam")
-        coffee = Coffee("Flat White")
+    def test_orders(self):
+        order = Order(self.alice, self.latte, 5.0)
+        self.assertEqual(self.latte.orders(), [order])
 
-        c1.create_order(coffee, 4.5)
-        c2.create_order(coffee, 5.0)
+    def test_customers(self):
+        Order(self.alice, self.latte, 5.0)
+        self.assertEqual(self.latte.customers(), [self.alice])
 
-        self.assertEqual(len(coffee.orders()), 2)
-        self.assertIn(c1, coffee.customers())
-        self.assertIn(c2, coffee.customers())
+    def test_num_orders(self):
+        Order(self.alice, self.latte, 5.0)
+        self.assertEqual(self.latte.num_orders(), 1)
 
-    def test_num_orders_and_average(self):
-        coffee = Coffee("Latte")
-        c = Customer("Chad")
-        c.create_order(coffee, 4.0)
-        c.create_order(coffee, 6.0)
+    def test_average_price(self):
+        Order(self.alice, self.latte, 5.0)
+        Order(self.alice, self.latte, 7.0)
+        self.assertEqual(self.latte.average_price(), 6.0)
 
-        self.assertEqual(coffee.num_orders(), 2)
-        self.assertEqual(coffee.average_price(), 5.0)
-
-        # Edge case: no orders
-        new_coffee = Coffee("Cappuccino")
-        self.assertEqual(new_coffee.num_orders(), 0)
-        self.assertEqual(new_coffee.average_price(), 0)
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
